@@ -1,4 +1,5 @@
 {
+  "name": "payout_calculator",
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]
