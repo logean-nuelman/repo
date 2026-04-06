@@ -328,12 +328,12 @@ export default function Dashboard() {
                         {payout.incomeItems.map((item, i) => (
                           <div key={i} className="flex justify-between text-sm">
                             <span className="text-gray-600 dark:text-gray-300">+ {item.label}</span>
-                            <span className="text-gray-900 dark:text-white">${item.amount.toFixed(2)}</span>
+                            <span className="text-gray-900 dark:text-white">₱{item.amount.toFixed(2)}</span>
                           </div>
                         ))}
                         <div className="flex justify-between text-sm font-medium border-t border-gray-200 dark:border-gray-700 pt-1">
                           <span className="text-green-600 dark:text-green-400">Total Income</span>
-                          <span className="text-green-600 dark:text-green-400">${payout.totalIncome.toFixed(2)}</span>
+                          <span className="text-green-600 dark:text-green-400">₱{payout.totalIncome.toFixed(2)}</span>
                         </div>
                       </div>
 
@@ -342,12 +342,12 @@ export default function Dashboard() {
                         {payout.expenseItems.map((item, i) => (
                           <div key={i} className="flex justify-between text-sm">
                             <span className="text-gray-600 dark:text-gray-300">- {item.label}</span>
-                            <span className="text-gray-900 dark:text-white">${item.amount.toFixed(2)}</span>
+                            <span className="text-gray-900 dark:text-white">₱{item.amount.toFixed(2)}</span>
                           </div>
                         ))}
                         <div className="flex justify-between text-sm font-medium border-t border-gray-200 dark:border-gray-700 pt-1">
                           <span className="text-red-600 dark:text-red-400">Total Expenses</span>
-                          <span className="text-red-600 dark:text-red-400">${payout.totalExpenses.toFixed(2)}</span>
+                          <span className="text-red-600 dark:text-red-400">₱{payout.totalExpenses.toFixed(2)}</span>
                         </div>
                       </div>
 
@@ -355,7 +355,7 @@ export default function Dashboard() {
                         <div className="flex justify-between font-semibold">
                           <span className="text-gray-900 dark:text-white">Remaining</span>
                           <span className={payout.remaining >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
-                            ${payout.remaining.toFixed(2)}
+                            ₱{payout.remaining.toFixed(2)}
                           </span>
                         </div>
                       </div>

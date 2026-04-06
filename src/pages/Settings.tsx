@@ -204,7 +204,7 @@ export default function Settings() {
                         onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
                         className="w-24 px-2 py-1 border rounded dark:bg-gray-700 dark:text-white"
                       />
-                    ) : `$${item.amount.toFixed(2)}`}
+                    ) : `₱${item.amount.toFixed(2)}`}
                   </td>
                   <td className="px-4 py-2">
                     {editingIncome === item.id ? (
@@ -282,7 +282,7 @@ export default function Settings() {
                         onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
                         className="w-24 px-2 py-1 border rounded dark:bg-gray-700 dark:text-white"
                       />
-                    ) : `$${item.amount.toFixed(2)}`}
+                    ) : `₱${item.amount.toFixed(2)}`}
                   </td>
                   <td className="px-4 py-2">
                     {editingExpense === item.id ? (
