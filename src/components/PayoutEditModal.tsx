@@ -335,8 +335,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
           <div>
             <h4 className="text-sm font-medium text-green-600 dark:text-green-400 mb-2">Income</h4>
             <div className="space-y-2">
-              {applicableIncome.map(item => {
-                const removed = isItemRemoved(item.label, customIncomeItems)
+              {applicableIncome.filter(item => !isItemRemoved(item.label, customIncomeItems)).map(item => {
                 const customAmount = getCustomAmount(item.label, customIncomeItems)
                 const displayAmount = customAmount ?? item.amount
                 const editKey = `income-${item.id}`
@@ -346,7 +345,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                     <div className="flex items-center gap-2 flex-1">
                       <input
                         type="checkbox"
-                        checked={!removed}
+                        checked={true}
                         onChange={() => toggleIncomeItem(item.label)}
                         className="rounded border-gray-300"
                       />
@@ -374,7 +373,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                             }])
                           }
                         }}
-                        disabled={removed}
+                        disabled={false}
                         className="w-24 px-2 py-1 border rounded dark:bg-gray-700 dark:text-white text-sm disabled:opacity-50"
                       />
                     </div>
@@ -436,8 +435,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
           <div>
             <h4 className="text-sm font-medium text-red-600 dark:text-red-400 mb-2">Expenses & Bills</h4>
             <div className="space-y-2">
-              {applicableExpense.map(item => {
-                const removed = isItemRemoved(item.label, customExpenseItems)
+              {applicableExpense.filter(item => !isItemRemoved(item.label, customExpenseItems)).map(item => {
                 const customAmount = getCustomAmount(item.label, customExpenseItems)
                 const displayAmount = customAmount ?? item.amount
                 const editKey = `expense-${item.id}`
@@ -447,7 +445,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                     <div className="flex items-center gap-2 flex-1">
                       <input
                         type="checkbox"
-                        checked={!removed}
+                        checked={true}
                         onChange={() => toggleExpenseItem(item.label)}
                         className="rounded border-gray-300"
                       />
@@ -474,7 +472,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                             }])
                           }
                         }}
-                        disabled={removed}
+                        disabled={false}
                         className="w-24 px-2 py-1 border rounded dark:bg-gray-700 dark:text-white text-sm disabled:opacity-50"
                       />
                     </div>
