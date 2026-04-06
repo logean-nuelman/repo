@@ -253,14 +253,14 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
             label,
             amount,
             is_custom: true,
-            is_removed: false
+            is_removed: item.is_removed
           }
           const { data } = await supabase.from('payout_income_items').insert(newItem).select().single()
           if (data) {
             setCustomIncomeItems(customIncomeItems.map(i => i.id === item.id ? { ...i, id: data.id } : i))
           }
         } else {
-          await supabase.from('payout_income_items').update({ label, amount }).eq('id', item.id)
+          await supabase.from('payout_income_items').update({ label, amount, is_removed: item.is_removed }).eq('id', item.id)
         }
       }
 
@@ -275,14 +275,14 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
             label,
             amount,
             is_custom: true,
-            is_removed: false
+            is_removed: item.is_removed
           }
           const { data } = await supabase.from('payout_expense_items').insert(newItem).select().single()
           if (data) {
             setCustomExpenseItems(customExpenseItems.map(i => i.id === item.id ? { ...i, id: data.id } : i))
           }
         } else {
-          await supabase.from('payout_expense_items').update({ label, amount }).eq('id', item.id)
+          await supabase.from('payout_expense_items').update({ label, amount, is_removed: item.is_removed }).eq('id', item.id)
         }
       }
 
@@ -402,8 +402,16 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                 )
               })}
               {customIncomeItems.filter(i => i.is_custom).map(item => (
-                <div key={item.id} className="flex items-center justify-between p-2 rounded">
+                <div key={item.id} className={`flex items-center justify-between p-2 rounded ${item.is_removed ? 'opacity-40' : ''}`}>
                   <div className="flex items-center gap-2 flex-1">
+                    <input
+                      type="checkbox"
+                      checked={!item.is_removed}
+                      onChange={() => setCustomIncomeItems(customIncomeItems.map(i =>
+                        i.id === item.id ? { ...i, is_removed: !i.is_removed } : i
+                      ))}
+                      className="rounded border-gray-300"
+                    />
                     <input
                       type="text"
                       value={editForm[`${item.id}-label`] ?? item.label}
@@ -418,9 +426,6 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                       onChange={(e) => updateItemAmount('income', item.id, e.target.value)}
                       className="w-24 px-2 py-1 border rounded dark:bg-gray-700 dark:text-white text-sm"
                     />
-                    <button onClick={() => removeCustomItem('income', item.id)} className="text-red-500">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
                 </div>
               ))}
@@ -506,8 +511,16 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                 )
               })}
               {customExpenseItems.filter(i => i.is_custom).map(item => (
-                <div key={item.id} className="flex items-center justify-between p-2 rounded">
+                <div key={item.id} className={`flex items-center justify-between p-2 rounded ${item.is_removed ? 'opacity-40' : ''}`}>
                   <div className="flex items-center gap-2 flex-1">
+                    <input
+                      type="checkbox"
+                      checked={!item.is_removed}
+                      onChange={() => setCustomExpenseItems(customExpenseItems.map(i =>
+                        i.id === item.id ? { ...i, is_removed: !i.is_removed } : i
+                      ))}
+                      className="rounded border-gray-300"
+                    />
                     <input
                       type="text"
                       value={editForm[`${item.id}-label`] ?? item.label}
@@ -522,9 +535,6 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                       onChange={(e) => updateItemAmount('expense', item.id, e.target.value)}
                       className="w-24 px-2 py-1 border rounded dark:bg-gray-700 dark:text-white text-sm"
                     />
-                    <button onClick={() => removeCustomItem('expense', item.id)} className="text-red-500">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
                 </div>
               ))}
