@@ -432,15 +432,17 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
             </div>
             <div className="mt-2">
               <select
-                value=""
+                key={`income-select-${customIncomeItems.length}`}
                 onChange={(e) => {
                   if (e.target.value === 'new') {
                     addCustomIncomeItem()
                   } else if (e.target.value) {
                     toggleIncomeItem(e.target.value)
                   }
+                  setTimeout(() => { e.target.value = '' }, 0)
                 }}
                 className="w-full px-2 py-1 border rounded dark:bg-gray-700 dark:text-white text-sm"
+                defaultValue=""
               >
                 <option value="" disabled>+ Add Income...</option>
                 {globalIncomeItems
@@ -539,15 +541,17 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
             </div>
             <div className="mt-2">
               <select
-                value=""
+                key={`expense-select-${customExpenseItems.length}`}
                 onChange={(e) => {
                   if (e.target.value === 'new') {
                     addCustomExpenseItem()
                   } else if (e.target.value) {
                     toggleExpenseItem(e.target.value)
                   }
+                  setTimeout(() => { e.target.value = '' }, 0)
                 }}
                 className="w-full px-2 py-1 border rounded dark:bg-gray-700 dark:text-white text-sm"
+                defaultValue=""
               >
                 <option value="" disabled>+ Add Expense...</option>
                 {globalExpenseItems
