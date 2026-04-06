@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { formatCurrency } from '../lib/format'
-import { Trash2, X, Save } from 'lucide-react'
+import { X, Save } from 'lucide-react'
 import { parseISO } from 'date-fns'
 
 interface PayoutEditModalProps {
@@ -34,6 +34,8 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
   const [customExpenseItems, setCustomExpenseItems] = useState<PayoutItem[]>([])
   const [initiallyRemovedIncome, setInitiallyRemovedIncome] = useState<Set<string>>(new Set())
   const [initiallyRemovedExpense, setInitiallyRemovedExpense] = useState<Set<string>>(new Set())
+  const [initiallyRemovedCustomIncome, setInitiallyRemovedCustomIncome] = useState<Set<string>>(new Set())
+  const [initiallyRemovedCustomExpense, setInitiallyRemovedCustomExpense] = useState<Set<string>>(new Set())
   const [editForm, setEditForm] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -93,11 +95,14 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
       // Track which GLOBAL items were already removed in the DB (not custom items)
       const removedLabels = new Set(customIncomeRes.data.filter(i => i.is_removed && !i.is_custom).map(i => i.label))
       setInitiallyRemovedIncome(removedLabels)
+      // Track custom items that were already removed in the DB
+      setInitiallyRemovedCustomIncome(new Set(customIncomeRes.data.filter(i => i.is_custom && i.is_removed).map(i => i.id)))
     }
     if (customExpenseRes.data) {
       setCustomExpenseItems(customExpenseRes.data)
       const removedLabels = new Set(customExpenseRes.data.filter(i => i.is_removed && !i.is_custom).map(i => i.label))
       setInitiallyRemovedExpense(removedLabels)
+      setInitiallyRemovedCustomExpense(new Set(customExpenseRes.data.filter(i => i.is_custom && i.is_removed).map(i => i.id)))
     }
 
     setLoading(false)
@@ -175,13 +180,6 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
     }])
   }
 
-  const removeCustomItem = (type: 'income' | 'expense', id: string) => {
-    if (type === 'income') {
-      setCustomIncomeItems(customIncomeItems.filter(i => i.id !== id))
-    } else {
-      setCustomExpenseItems(customExpenseItems.filter(i => i.id !== id))
-    }
-  }
 
   const updateItemAmount = (_type: 'income' | 'expense', id: string, amount: string) => {
     setEditForm({ ...editForm, [id]: amount })
@@ -401,7 +399,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                   </div>
                 )
               })}
-              {customIncomeItems.filter(i => i.is_custom && !initiallyRemovedIncome.has(i.label)).map(item => (
+              {customIncomeItems.filter(i => i.is_custom && !initiallyRemovedCustomIncome.has(i.id)).map(item => (
                 <div key={item.id} className={`flex items-center justify-between p-2 rounded ${item.is_removed ? 'opacity-40' : ''}`}>
                   <div className="flex items-center gap-2 flex-1">
                     <input
@@ -510,7 +508,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                   </div>
                 )
               })}
-              {customExpenseItems.filter(i => i.is_custom && !initiallyRemovedExpense.has(i.label)).map(item => (
+              {customExpenseItems.filter(i => i.is_custom && !initiallyRemovedCustomExpense.has(i.id)).map(item => (
                 <div key={item.id} className={`flex items-center justify-between p-2 rounded ${item.is_removed ? 'opacity-40' : ''}`}>
                   <div className="flex items-center gap-2 flex-1">
                     <input
