@@ -40,18 +40,27 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
   }, [payoutId])
 
   const fetchPayoutData = async () => {
+    console.log('Fetching payout data for:', payoutId)
     // Get payout date and projection_id
-    const { data: payoutDateData } = await supabase
+    const { data: payoutDateData, error: payoutError } = await supabase
       .from('payout_dates')
       .select('payout_date, projection_id')
       .eq('id', payoutId)
       .single()
 
-    if (!payoutDateData) {
+    if (payoutError) {
+      console.error('Error fetching payout date:', payoutError)
       setLoading(false)
       return
     }
 
+    if (!payoutDateData) {
+      console.log('No payout date found')
+      setLoading(false)
+      return
+    }
+
+    console.log('Payout date found:', payoutDateData)
     setPayoutDate(payoutDateData.payout_date)
     setProjectionId(payoutDateData.projection_id)
 
@@ -61,6 +70,9 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
       supabase.from('expense_items').select('*').eq('projection_id', payoutDateData.projection_id)
     ])
 
+    console.log('Global income items:', incomeRes)
+    console.log('Global expense items:', expenseRes)
+
     if (incomeRes.data) setGlobalIncomeItems(incomeRes.data)
     if (expenseRes.data) setGlobalExpenseItems(expenseRes.data)
 
@@ -69,6 +81,9 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
       supabase.from('payout_income_items').select('*').eq('payout_date_id', payoutId),
       supabase.from('payout_expense_items').select('*').eq('payout_date_id', payoutId)
     ])
+
+    console.log('Custom income items:', customIncomeRes)
+    console.log('Custom expense items:', customExpenseRes)
 
     if (customIncomeRes.data) setCustomIncomeItems(customIncomeRes.data)
     if (customExpenseRes.data) setCustomExpenseItems(customExpenseRes.data)
@@ -168,73 +183,46 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
       // Save edited global income item amounts
       for (const item of applicableIncome) {
         const editKey = `income-${item.id}`
-        if (editForm[editKey] !== undefined) {
-          const amount = parseFloat(editForm[editKey]) || item.amount
-          // Check if there's already a custom record
-          const existing = customIncomeItems.find(i => i.label === item.label && !i.is_custom)
-          if (existing) {
-            await supabase.from('payout_income_items').update({ amount, is_removed: existing.is_removed }).eq('id', existing.id)
-          } else {
-            const { data } = await supabase.from('payout_income_items').insert({
-              payout_date_id: payoutId,
-              label: item.label,
-              amount,
-              is_custom: false,
-              is_removed: isItemRemoved(item.label, customIncomeItems)
-            }).select().single()
-            if (data) {
-              setCustomIncomeItems([...customIncomeItems, data])
+        const amount = parseFloat(editForm[editKey] ?? String(item.amount)) || item.amount
+        const removed = isItemRemoved(item.label, customIncomeItems)
+        // Check if there's already a DB record (not a temp ID)
+        const existing = customIncomeItems.find(i => i.label === item.label && !i.is_custom && !i.id.startsWith('override-') && !i.id.startsWith('temp-'))
+        if (existing) {
+          await supabase.from('payout_income_items').update({ amount, is_removed: removed }).eq('id', existing.id)
+        } else {
+          // Delete any temp records first
+          const tempRecords = customIncomeItems.filter(i => i.label === item.label && !i.is_custom && (i.id.startsWith('override-') || i.id.startsWith('temp-')))
+          for (const temp of tempRecords) {
+            if (!temp.id.startsWith('temp-') && !temp.id.startsWith('override-')) {
+              // skip - only delete real DB records that shouldn't exist
             }
           }
-        } else if (isItemRemoved(item.label, customIncomeItems)) {
-          const existing = customIncomeItems.find(i => i.label === item.label && !i.is_custom)
-          if (existing) {
-            await supabase.from('payout_income_items').update({ is_removed: true }).eq('id', existing.id)
-          } else {
-            await supabase.from('payout_income_items').insert({
-              payout_date_id: payoutId,
-              label: item.label,
-              amount: item.amount,
-              is_custom: false,
-              is_removed: true
-            })
-          }
+          await supabase.from('payout_income_items').insert({
+            payout_date_id: payoutId,
+            label: item.label,
+            amount,
+            is_custom: false,
+            is_removed: removed
+          })
         }
       }
 
       // Save edited global expense item amounts
       for (const item of applicableExpense) {
         const editKey = `expense-${item.id}`
-        if (editForm[editKey] !== undefined) {
-          const amount = parseFloat(editForm[editKey]) || item.amount
-          const existing = customExpenseItems.find(i => i.label === item.label && !i.is_custom)
-          if (existing) {
-            await supabase.from('payout_expense_items').update({ amount, is_removed: existing.is_removed }).eq('id', existing.id)
-          } else {
-            const { data } = await supabase.from('payout_expense_items').insert({
-              payout_date_id: payoutId,
-              label: item.label,
-              amount,
-              is_custom: false,
-              is_removed: isItemRemoved(item.label, customExpenseItems)
-            }).select().single()
-            if (data) {
-              setCustomExpenseItems([...customExpenseItems, data])
-            }
-          }
-        } else if (isItemRemoved(item.label, customExpenseItems)) {
-          const existing = customExpenseItems.find(i => i.label === item.label && !i.is_custom)
-          if (existing) {
-            await supabase.from('payout_expense_items').update({ is_removed: true }).eq('id', existing.id)
-          } else {
-            await supabase.from('payout_expense_items').insert({
-              payout_date_id: payoutId,
-              label: item.label,
-              amount: item.amount,
-              is_custom: false,
-              is_removed: true
-            })
-          }
+        const amount = parseFloat(editForm[editKey] ?? String(item.amount)) || item.amount
+        const removed = isItemRemoved(item.label, customExpenseItems)
+        const existing = customExpenseItems.find(i => i.label === item.label && !i.is_custom && !i.id.startsWith('override-') && !i.id.startsWith('temp-'))
+        if (existing) {
+          await supabase.from('payout_expense_items').update({ amount, is_removed: removed }).eq('id', existing.id)
+        } else {
+          await supabase.from('payout_expense_items').insert({
+            payout_date_id: payoutId,
+            label: item.label,
+            amount,
+            is_custom: false,
+            is_removed: removed
+          })
         }
       }
 
