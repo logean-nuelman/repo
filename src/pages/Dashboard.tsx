@@ -141,6 +141,43 @@ export default function Dashboard() {
     if (projectionId) fetchPayoutItems()
   }, [projectionId, fetchPayoutItems])
 
+  // Real-time subscriptions
+  useEffect(() => {
+    if (!projectionId) return
+
+    const channel = supabase
+      .channel('dashboard-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'payout_income_items' },
+        () => fetchPayoutItems()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'payout_expense_items' },
+        () => fetchPayoutItems()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'income_items' },
+        () => {
+          if (projectionId) fetchGlobalIncomeItems(projectionId)
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'expense_items' },
+        () => {
+          if (projectionId) fetchGlobalExpenseItems(projectionId)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [projectionId, fetchPayoutItems])
+
   const getMonthData = useCallback((date: Date): MonthGroup | null => {
     if (!projectionId) return null
 
