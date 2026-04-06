@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { formatCurrency } from '../lib/format'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import { Plus, Trash2, Edit2, Save, X } from 'lucide-react'
@@ -204,7 +205,7 @@ export default function Settings() {
                         onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
                         className="w-24 px-2 py-1 border rounded dark:bg-gray-700 dark:text-white"
                       />
-                    ) : `₱${item.amount.toFixed(2)}`}
+                    ) : `₱${formatCurrency(item.amount)}`}
                   </td>
                   <td className="px-4 py-2">
                     {editingIncome === item.id ? (
@@ -282,7 +283,7 @@ export default function Settings() {
                         onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
                         className="w-24 px-2 py-1 border rounded dark:bg-gray-700 dark:text-white"
                       />
-                    ) : `₱${item.amount.toFixed(2)}`}
+                    ) : `₱${formatCurrency(item.amount)}`}
                   </td>
                   <td className="px-4 py-2">
                     {editingExpense === item.id ? (

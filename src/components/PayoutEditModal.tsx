@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { formatCurrency } from '../lib/format'
 import { Plus, Trash2, X, Save } from 'lucide-react'
 import { parseISO } from 'date-fns'
 
@@ -423,7 +424,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                   .filter(i => isItemRemoved(i.label, customIncomeItems))
                   .map(item => (
                     <option key={item.id} value={item.label}>
-                      {item.label} (₱{item.amount.toFixed(2)})
+                      {item.label} (₱{formatCurrency(item.amount)})
                     </option>
                   ))}
                 <option value="new">+ New custom income item</option>
@@ -522,7 +523,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                   .filter(i => isItemRemoved(i.label, customExpenseItems))
                   .map(item => (
                     <option key={item.id} value={item.label}>
-                      {item.label} (₱{item.amount.toFixed(2)})
+                      {item.label} (₱{formatCurrency(item.amount)})
                     </option>
                   ))}
                 <option value="new">+ New custom expense item</option>
@@ -534,7 +535,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <div className="flex justify-between font-semibold text-lg">
               <span>Remaining</span>
-              <span className={remaining >= 0 ? 'text-green-600' : 'text-red-600'}>₱{remaining.toFixed(2)}</span>
+              <span className={remaining >= 0 ? 'text-green-600' : 'text-red-600'}>₱{formatCurrency(remaining)}</span>
             </div>
           </div>
         </div>
