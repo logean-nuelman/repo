@@ -432,11 +432,11 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
             </div>
             <div className="mt-2">
               <select
+                key={`income-select-${customIncomeItems.length}`}
                 onChange={(e) => {
                   if (e.target.value === 'new') {
                     addCustomIncomeItem()
                   } else if (e.target.value) {
-                    // Re-add a removed global item
                     toggleIncomeItem(e.target.value)
                   }
                   e.target.value = ''
@@ -541,6 +541,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
             </div>
             <div className="mt-2">
               <select
+                key={`expense-select-${customExpenseItems.length}`}
                 onChange={(e) => {
                   if (e.target.value === 'new') {
                     addCustomExpenseItem()
