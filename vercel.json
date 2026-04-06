@@ -1,5 +1,5 @@
 {
-  "name": "payout_calculator",
+  "name": "payout_tracker",
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]
