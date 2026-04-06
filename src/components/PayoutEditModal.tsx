@@ -32,6 +32,8 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
   const [globalExpenseItems, setGlobalExpenseItems] = useState<GlobalItem[]>([])
   const [customIncomeItems, setCustomIncomeItems] = useState<PayoutItem[]>([])
   const [customExpenseItems, setCustomExpenseItems] = useState<PayoutItem[]>([])
+  const [initiallyRemovedIncome, setInitiallyRemovedIncome] = useState<Set<string>>(new Set())
+  const [initiallyRemovedExpense, setInitiallyRemovedExpense] = useState<Set<string>>(new Set())
   const [editForm, setEditForm] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -86,8 +88,17 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
     console.log('Custom income items:', customIncomeRes)
     console.log('Custom expense items:', customExpenseRes)
 
-    if (customIncomeRes.data) setCustomIncomeItems(customIncomeRes.data)
-    if (customExpenseRes.data) setCustomExpenseItems(customExpenseRes.data)
+    if (customIncomeRes.data) {
+      setCustomIncomeItems(customIncomeRes.data)
+      // Track which items were already removed in the DB
+      const removedLabels = new Set(customIncomeRes.data.filter(i => i.is_removed).map(i => i.label))
+      setInitiallyRemovedIncome(removedLabels)
+    }
+    if (customExpenseRes.data) {
+      setCustomExpenseItems(customExpenseRes.data)
+      const removedLabels = new Set(customExpenseRes.data.filter(i => i.is_removed).map(i => i.label))
+      setInitiallyRemovedExpense(removedLabels)
+    }
 
     setLoading(false)
   }
@@ -335,17 +346,18 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
           <div>
             <h4 className="text-sm font-medium text-green-600 dark:text-green-400 mb-2">Income</h4>
             <div className="space-y-2">
-              {applicableIncome.filter(item => !isItemRemoved(item.label, customIncomeItems)).map(item => {
+              {applicableIncome.filter(item => !initiallyRemovedIncome.has(item.label)).map(item => {
+                const removed = isItemRemoved(item.label, customIncomeItems)
                 const customAmount = getCustomAmount(item.label, customIncomeItems)
                 const displayAmount = customAmount ?? item.amount
                 const editKey = `income-${item.id}`
                 const currentAmount = editForm[editKey] ?? String(displayAmount)
                 return (
-                  <div key={item.id} className="flex items-center justify-between p-2 rounded">
+                  <div key={item.id} className={`flex items-center justify-between p-2 rounded ${removed ? 'opacity-40' : ''}`}>
                     <div className="flex items-center gap-2 flex-1">
                       <input
                         type="checkbox"
-                        checked={true}
+                        checked={!removed}
                         onChange={() => toggleIncomeItem(item.label)}
                         className="rounded border-gray-300"
                       />
@@ -435,17 +447,18 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
           <div>
             <h4 className="text-sm font-medium text-red-600 dark:text-red-400 mb-2">Expenses & Bills</h4>
             <div className="space-y-2">
-              {applicableExpense.filter(item => !isItemRemoved(item.label, customExpenseItems)).map(item => {
+              {applicableExpense.filter(item => !initiallyRemovedExpense.has(item.label)).map(item => {
+                const removed = isItemRemoved(item.label, customExpenseItems)
                 const customAmount = getCustomAmount(item.label, customExpenseItems)
                 const displayAmount = customAmount ?? item.amount
                 const editKey = `expense-${item.id}`
                 const currentAmount = editForm[editKey] ?? String(displayAmount)
                 return (
-                  <div key={item.id} className="flex items-center justify-between p-2 rounded">
+                  <div key={item.id} className={`flex items-center justify-between p-2 rounded ${removed ? 'opacity-40' : ''}`}>
                     <div className="flex items-center gap-2 flex-1">
                       <input
                         type="checkbox"
-                        checked={true}
+                        checked={!removed}
                         onChange={() => toggleExpenseItem(item.label)}
                         className="rounded border-gray-300"
                       />

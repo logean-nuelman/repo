@@ -150,28 +150,38 @@ export default function Dashboard() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'payout_income_items' },
-        () => fetchPayoutItems()
+        (payload) => {
+          console.log('payout_income_items changed:', payload)
+          fetchPayoutItems()
+        }
       )
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'payout_expense_items' },
-        () => fetchPayoutItems()
+        (payload) => {
+          console.log('payout_expense_items changed:', payload)
+          fetchPayoutItems()
+        }
       )
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'income_items' },
-        () => {
+        (payload) => {
+          console.log('income_items changed:', payload)
           if (projectionId) fetchGlobalIncomeItems(projectionId)
         }
       )
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'expense_items' },
-        () => {
+        (payload) => {
+          console.log('expense_items changed:', payload)
           if (projectionId) fetchGlobalExpenseItems(projectionId)
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status)
+      })
 
     return () => {
       supabase.removeChannel(channel)
