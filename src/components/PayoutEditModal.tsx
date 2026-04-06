@@ -90,7 +90,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
 
     if (customIncomeRes.data) {
       setCustomIncomeItems(customIncomeRes.data)
-      // Track which items were already removed in the DB
+      // Track which items were already removed in the DB (both global and custom)
       const removedLabels = new Set(customIncomeRes.data.filter(i => i.is_removed).map(i => i.label))
       setInitiallyRemovedIncome(removedLabels)
     }
@@ -401,7 +401,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                   </div>
                 )
               })}
-              {customIncomeItems.filter(i => i.is_custom && !i.is_removed).map(item => (
+              {customIncomeItems.filter(i => i.is_custom && !initiallyRemovedIncome.has(i.label)).map(item => (
                 <div key={item.id} className={`flex items-center justify-between p-2 rounded ${item.is_removed ? 'opacity-40' : ''}`}>
                   <div className="flex items-center gap-2 flex-1">
                     <input
@@ -510,7 +510,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                   </div>
                 )
               })}
-              {customExpenseItems.filter(i => i.is_custom && !i.is_removed).map(item => (
+              {customExpenseItems.filter(i => i.is_custom && !initiallyRemovedExpense.has(i.label)).map(item => (
                 <div key={item.id} className={`flex items-center justify-between p-2 rounded ${item.is_removed ? 'opacity-40' : ''}`}>
                   <div className="flex items-center gap-2 flex-1">
                     <input
