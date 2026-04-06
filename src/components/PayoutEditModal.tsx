@@ -430,30 +430,24 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                 </div>
               ))}
             </div>
-            <div className="mt-2">
-              <select
-                key={`income-select-${customIncomeItems.length}`}
-                onChange={(e) => {
-                  if (e.target.value === 'new') {
-                    addCustomIncomeItem()
-                  } else if (e.target.value) {
-                    toggleIncomeItem(e.target.value)
-                  }
-                  e.target.value = ''
-                }}
-                className="w-full px-2 py-1 border rounded dark:bg-gray-700 dark:text-white text-sm"
-                defaultValue=""
+            <div className="mt-2 space-y-1">
+              {globalIncomeItems
+                .filter(i => isItemRemoved(i.label, customIncomeItems))
+                .map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleIncomeItem(item.label)}
+                    className="w-full text-left px-2 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  >
+                    + {item.label} (₱{formatCurrency(item.amount)})
+                  </button>
+                ))}
+              <button
+                onClick={addCustomIncomeItem}
+                className="w-full text-left px-2 py-1 text-sm text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
-                <option value="" disabled>+ Add Income...</option>
-                {globalIncomeItems
-                  .filter(i => isItemRemoved(i.label, customIncomeItems))
-                  .map(item => (
-                    <option key={item.id} value={item.label}>
-                      {item.label} (₱{formatCurrency(item.amount)})
-                    </option>
-                  ))}
-                <option value="new">+ New custom income item</option>
-              </select>
+                + New custom income item
+              </button>
             </div>
           </div>
 
@@ -539,30 +533,24 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                 </div>
               ))}
             </div>
-            <div className="mt-2">
-              <select
-                key={`expense-select-${customExpenseItems.length}`}
-                onChange={(e) => {
-                  if (e.target.value === 'new') {
-                    addCustomExpenseItem()
-                  } else if (e.target.value) {
-                    toggleExpenseItem(e.target.value)
-                  }
-                  e.target.value = ''
-                }}
-                className="w-full px-2 py-1 border rounded dark:bg-gray-700 dark:text-white text-sm"
-                defaultValue=""
+            <div className="mt-2 space-y-1">
+              {globalExpenseItems
+                .filter(i => isItemRemoved(i.label, customExpenseItems))
+                .map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleExpenseItem(item.label)}
+                    className="w-full text-left px-2 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  >
+                    + {item.label} (₱{formatCurrency(item.amount)})
+                  </button>
+                ))}
+              <button
+                onClick={addCustomExpenseItem}
+                className="w-full text-left px-2 py-1 text-sm text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
-                <option value="" disabled>+ Add Expense...</option>
-                {globalExpenseItems
-                  .filter(i => isItemRemoved(i.label, customExpenseItems))
-                  .map(item => (
-                    <option key={item.id} value={item.label}>
-                      {item.label} (₱{formatCurrency(item.amount)})
-                    </option>
-                  ))}
-                <option value="new">+ New custom expense item</option>
-              </select>
+                + New custom expense item
+              </button>
             </div>
           </div>
 
