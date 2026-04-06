@@ -26,7 +26,7 @@ interface PayoutItem {
 
 export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEditModalProps) {
   const [payoutDate, setPayoutDate] = useState<string | null>(null)
-  const [projectionId, setProjectionId] = useState<string | null>(null)
+  const [_projectionId, setProjectionId] = useState<string | null>(null)
   const [globalIncomeItems, setGlobalIncomeItems] = useState<GlobalItem[]>([])
   const [globalExpenseItems, setGlobalExpenseItems] = useState<GlobalItem[]>([])
   const [customIncomeItems, setCustomIncomeItems] = useState<PayoutItem[]>([])
@@ -152,11 +152,11 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
     }
   }
 
-  const updateItemAmount = (type: 'income' | 'expense', id: string, amount: string) => {
+  const updateItemAmount = (_type: 'income' | 'expense', id: string, amount: string) => {
     setEditForm({ ...editForm, [id]: amount })
   }
 
-  const updateItemLabel = (type: 'income' | 'expense', id: string, label: string) => {
+  const updateItemLabel = (_type: 'income' | 'expense', id: string, label: string) => {
     setEditForm({ ...editForm, [id]: label })
   }
 
