@@ -341,7 +341,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                 const editKey = `income-${item.id}`
                 const currentAmount = editForm[editKey] ?? String(displayAmount)
                 return (
-                  <div key={item.id} className={`flex items-center justify-between p-2 rounded ${removed ? 'opacity-50' : ''}`}>
+                  <div key={item.id} className="flex items-center justify-between p-2 rounded">
                     <div className="flex items-center gap-2 flex-1">
                       <input
                         type="checkbox"
@@ -442,7 +442,7 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                 const editKey = `expense-${item.id}`
                 const currentAmount = editForm[editKey] ?? String(displayAmount)
                 return (
-                  <div key={item.id} className={`flex items-center justify-between p-2 rounded ${removed ? 'opacity-50' : ''}`}>
+                  <div key={item.id} className="flex items-center justify-between p-2 rounded">
                     <div className="flex items-center gap-2 flex-1">
                       <input
                         type="checkbox"
