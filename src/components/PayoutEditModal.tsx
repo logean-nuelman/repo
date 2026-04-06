@@ -90,13 +90,13 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
 
     if (customIncomeRes.data) {
       setCustomIncomeItems(customIncomeRes.data)
-      // Track which items were already removed in the DB (both global and custom)
-      const removedLabels = new Set(customIncomeRes.data.filter(i => i.is_removed).map(i => i.label))
+      // Track which GLOBAL items were already removed in the DB (not custom items)
+      const removedLabels = new Set(customIncomeRes.data.filter(i => i.is_removed && !i.is_custom).map(i => i.label))
       setInitiallyRemovedIncome(removedLabels)
     }
     if (customExpenseRes.data) {
       setCustomExpenseItems(customExpenseRes.data)
-      const removedLabels = new Set(customExpenseRes.data.filter(i => i.is_removed).map(i => i.label))
+      const removedLabels = new Set(customExpenseRes.data.filter(i => i.is_removed && !i.is_custom).map(i => i.label))
       setInitiallyRemovedExpense(removedLabels)
     }
 
