@@ -124,10 +124,12 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
         i.id === existing.id ? { ...i, is_removed: !i.is_removed } : i
       ))
     } else {
+      // Item was removed in a previous session - create a record to re-enable it
+      const globalItem = globalIncomeItems.find(i => i.label === label)
       setCustomIncomeItems([...customIncomeItems, {
         id: `temp-income-${Date.now()}`,
         label,
-        amount: globalIncomeItems.find(i => i.label === label)?.amount || 0,
+        amount: globalItem?.amount || 0,
         is_custom: false,
         is_removed: false
       }])
@@ -141,10 +143,12 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
         i.id === existing.id ? { ...i, is_removed: !i.is_removed } : i
       ))
     } else {
+      // Item was removed in a previous session - create a record to re-enable it
+      const globalItem = globalExpenseItems.find(i => i.label === label)
       setCustomExpenseItems([...customExpenseItems, {
         id: `temp-expense-${Date.now()}`,
         label,
-        amount: globalExpenseItems.find(i => i.label === label)?.amount || 0,
+        amount: globalItem?.amount || 0,
         is_custom: false,
         is_removed: false
       }])
@@ -346,7 +350,12 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
           <div>
             <h4 className="text-sm font-medium text-green-600 dark:text-green-400 mb-2">Income</h4>
             <div className="space-y-2">
-              {applicableIncome.filter(item => !initiallyRemovedIncome.has(item.label)).map(item => {
+              {applicableIncome.filter(item => {
+                // Show items that were NOT initially removed, OR were initially removed but have been toggled back
+                const wasInitiallyRemoved = initiallyRemovedIncome.has(item.label)
+                const isNowActive = !isItemRemoved(item.label, customIncomeItems)
+                return !wasInitiallyRemoved || isNowActive
+              }).map(item => {
                 const removed = isItemRemoved(item.label, customIncomeItems)
                 const customAmount = getCustomAmount(item.label, customIncomeItems)
                 const displayAmount = customAmount ?? item.amount
@@ -447,7 +456,11 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
           <div>
             <h4 className="text-sm font-medium text-red-600 dark:text-red-400 mb-2">Expenses & Bills</h4>
             <div className="space-y-2">
-              {applicableExpense.filter(item => !initiallyRemovedExpense.has(item.label)).map(item => {
+              {applicableExpense.filter(item => {
+                const wasInitiallyRemoved = initiallyRemovedExpense.has(item.label)
+                const isNowActive = !isItemRemoved(item.label, customExpenseItems)
+                return !wasInitiallyRemoved || isNowActive
+              }).map(item => {
                 const removed = isItemRemoved(item.label, customExpenseItems)
                 const customAmount = getCustomAmount(item.label, customExpenseItems)
                 const displayAmount = customAmount ?? item.amount
