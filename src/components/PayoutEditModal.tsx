@@ -404,9 +404,31 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                 </div>
               ))}
             </div>
-            <button onClick={addCustomIncomeItem} className="mt-2 flex items-center text-sm text-blue-600">
-              <Plus className="w-4 h-4 mr-1" /> Add Income
-            </button>
+            <div className="mt-2">
+              <select
+                onChange={(e) => {
+                  if (e.target.value === 'new') {
+                    addCustomIncomeItem()
+                  } else if (e.target.value) {
+                    // Re-add a removed global item
+                    toggleIncomeItem(e.target.value)
+                  }
+                  e.target.value = ''
+                }}
+                className="w-full px-2 py-1 border rounded dark:bg-gray-700 dark:text-white text-sm"
+                defaultValue=""
+              >
+                <option value="" disabled>+ Add Income...</option>
+                {globalIncomeItems
+                  .filter(i => isItemRemoved(i.label, customIncomeItems))
+                  .map(item => (
+                    <option key={item.id} value={item.label}>
+                      {item.label} (${item.amount.toFixed(2)})
+                    </option>
+                  ))}
+                <option value="new">+ New custom income item</option>
+              </select>
+            </div>
           </div>
 
           {/* Expenses */}
@@ -482,9 +504,30 @@ export default function PayoutEditModal({ payoutId, onClose, onSave }: PayoutEdi
                 </div>
               ))}
             </div>
-            <button onClick={addCustomExpenseItem} className="mt-2 flex items-center text-sm text-blue-600">
-              <Plus className="w-4 h-4 mr-1" /> Add Expense
-            </button>
+            <div className="mt-2">
+              <select
+                onChange={(e) => {
+                  if (e.target.value === 'new') {
+                    addCustomExpenseItem()
+                  } else if (e.target.value) {
+                    toggleExpenseItem(e.target.value)
+                  }
+                  e.target.value = ''
+                }}
+                className="w-full px-2 py-1 border rounded dark:bg-gray-700 dark:text-white text-sm"
+                defaultValue=""
+              >
+                <option value="" disabled>+ Add Expense...</option>
+                {globalExpenseItems
+                  .filter(i => isItemRemoved(i.label, customExpenseItems))
+                  .map(item => (
+                    <option key={item.id} value={item.label}>
+                      {item.label} (${item.amount.toFixed(2)})
+                    </option>
+                  ))}
+                <option value="new">+ New custom expense item</option>
+              </select>
+            </div>
           </div>
 
           {/* Summary */}
