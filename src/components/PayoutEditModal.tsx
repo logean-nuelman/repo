@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { formatCurrency } from '../lib/format'
-import { Plus, Trash2, X, Save } from 'lucide-react'
+import { Trash2, X, Save } from 'lucide-react'
 import { parseISO } from 'date-fns'
 
 interface PayoutEditModalProps {
